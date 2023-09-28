@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        /* Apply a background gradient to the entire body */
+        html, body, .container {
+            height: 100%; /* Make them take 100% of the viewport height */
+            margin: 0; /* Remove any default margin */
+            padding: 0; /* Remove any default padding */
+        }
+        body {
+          background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        
+        /* Style the header */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        /* Style the input and button */
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1.2rem;
+            border: 2px solid #24255c;
+            border-radius: 5px;
+            background-color: #74769e;
+            color: white;
+            width: 60%;
+        }
+        #lang1{
+            padding: 10px;
+            font-size: 0.8rem;
+            border: 1px solid #24255c;
+            border-radius: 2px;
+            background-color: #74769e;
+            color: white;
+            width: 10%;
+        }
+        #lang2{
+            padding: 10px;
+            font-size: 0.8rem;
+            border: 1px solid #24255c;
+            border-radius: 2px;
+            background-color: #74769e;
+            color: white;
+            width: 10%;
+        }
+        input[type="text"]::placeholder {
+            color: #17182186; /* Placeholder text color */
+        }
+        
+       #generateButton {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #573b8a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 5px 20px 50px #000;
+        }
+        
+        #generateButton:hover {
+            background-color:#39265a;
+        }
+        button {
+            padding: 10px 26px;
+            font-size: 1.2rem;
+            background-color: #573b8a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 5px 20px 50px #000;
+        }
+        
+        button:hover {
+            background-color:#39265a;
+        }
+
+        /* Style the output div */
+        #output {
+            margin-top: 20px;
+            background-color:#2e326b9f;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Style the API response text */
+        #output p {
+            font-size: 1.2rem;
+            color: #00ffcc;
+            margin-bottom: 10px;
+            text-align: left;
+            border-left: 4px solid #007bff;
+            padding-left: 10px;
+        }
+
+        /* Add a subtle animation to the response text */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #output p {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Apply animation to the button */
+        button.generate-button.loading::after {
+            content: "";
+            display: inline-block;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            margin-left: 10px;
+            vertical-align: middle;
+            animation: spin 1s linear infinite;
+        }
+        ul.navbar {
+            list-style-type: none;
+            margin: 20px;
+            background-color: #2e326b9f;
+            overflow: hidden;
+        }
+
+        li.navitem {
+            float: left;
+        }
+
+        li.navitem a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        li.navitem a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        li.login-button {
+            float: right; 
+        }
+
+        li.login-button a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+        li.login-button a:hover{
+          background-color: #ddd;
+            color: black;
+        }
+
+    </style>
+    <title>Stable Deffusion</title>
+    <link rel="icon" type="image/ico" href="/Authentication/ap_resize.ico"/>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+    <ul class="navbar">
+      <li class="navitem"><a href="home">Home</a></li>
+      <li class="navitem"><a href="https://meta.wikimedia.org/wiki/Template:List_of_language_names_ordered_by_code?setlang=ru">Help</a></li>
+      <li class="navitem"><a href="https://stablediffusionapi.com/docs/stable-diffusion-api/text2img/">API Documentation</a></li>
+      <li class="navitem"><a href="dash">Dashboard</a></li>
+      <li class="login-button" id="loginSignupButtons">
+        <form action="/signup"> &nbsp;&nbsp;&nbsp;
+            <button>Signup</button>
+        </form>
+    </li>
+
+    <li class="login-button" id="loginButton">
+        <form action="/login">
+            <button>Login</button>
+        </form>
+    </li>
+    <li id="userEmail">
+    </li>
+  </ul>
+  </div>
+    <h1>IMAGINE AI</h1>
+    <label for="prompt">Enter Prompt:</label>
+    <input type="text" id="prompt" placeholder="Enter your prompt"><br><br>
+    <button type="submit" id="generateButton">Generate</button><br><br>
+    <hr>
+    <div id="output">
+        <!-- The API response will be displayed here -->
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+
+// Function to generate an image
+document.addEventListener("DOMContentLoaded", () => {
+    const outputDiv = document.getElementById("output");
+const promptInput = document.getElementById("prompt");
+const generateButton = document.getElementById("generateButton");
+generateButton.addEventListener("click", async () => {
+async function generateImage() {
+    const prompt = promptInput.value;
+    if (prompt.trim() === "") {
+        alert("Please enter a prompt before generating.");
+        return;
+      }
+  const generateData = {
+    prompt: prompt,
+    negativePrompt: 'asymmetric, watermarks',
+    steps: 50,
+    width: 1024,
+    height: 1024,
+    numberOfImages: 1,
+    promptStrength: 7,
+    seed: 4523184,
+  };
+
+  const generateOptions = {
+    method: 'post',
+    url: 'https://api.tryleap.ai/api/v1/images/models/26a1a203-3a46-42cb-8cfa-f4de075907d8/inferences',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      authorization: 'Bearer 337f1799-fecc-4342-9853-db725fea6b6d',
+    },
+    data: generateData,
+  };
+  const generateButton = document.getElementById("generateButton");
+  
+  try {
+    const response = await axios(generateOptions);
+    const imageId = response.data.id;
+    console.log('Generated image ID:', imageId);
+    // Call the checkStatusAndFetchImage function with the generated image ID
+    checkStatusAndFetchImage(imageId);
+  } catch (error) {
+    console.error('Image generation failed:', error);
+  }
+}
+async function checkStatusAndFetchImage(imageId) {
+    console.log(imageId)
+    const fetchOptions = {
+      method: 'get',
+      url: `https://api.tryleap.ai/api/v1/images/models/26a1a203-3a46-42cb-8cfa-f4de075907d8/inferences/${imageId}`,
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        authorization: 'Bearer 337f1799-fecc-4342-9853-db725fea6b6d',
+      },
+    };
+  
+    try {
+        const response = await axios(fetchOptions);
+        console.log(`Response for image ${imageId}:`, response.data);
+      
+        if (response.data.status === 'finished') {
+          // Image is finished, fetch it here and handle as needed
+          const imageURI = response.data.images[0].uri;
+          console.log(imageURI);
+          const imageElement = document.createElement('img');
+            imageElement.src = imageURI;
+            outputDiv.innerHTML = ''; 
+            outputDiv.appendChild(imageElement);
+          console.log('Image is finished. Fetching...');
+          // Fetch and process the image
+          // ...
+        } else if (response.data.status === 'queued') {
+          // Image is still in queue, check again after a delay (e.g., 5 seconds)
+          console.log('Image is still in queue. Checking again...');
+          setTimeout(() => {
+            checkStatusAndFetchImage(imageId);
+          }, 10000); // 10 seconds delay
+        } else {
+          console.log('Image generation failed. Status:', response.data.status);
+          // Add your error handling logic here
+        }
+      } catch (error) {
+        console.error('Fetching image status failed:', error);
+        // Add your error handling logic here
+      }
+      
+}
+
+// Call the generateImage function to start the image generation process
+generateImage();
+});
+});
+  </script>
+</body>
+</html>

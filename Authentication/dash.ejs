@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        /* Add your CSS styles here */
+        html,body{
+            height: 100%; /* Make them take 100% of the viewport height */
+            margin: 0; /* Remove any default margin */
+            padding: 0;
+        }
+        body {
+            background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background-color: #2e326bc5;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            margin: 10px;
+            padding: 20px;
+            width: calc(33.33% - 20px);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dashboard</h1>
+    </header>
+    <div class="container">
+        <div class="card">
+            <h2>API Calls Remaining</h2>
+            <p id="responseNumber">20</p>
+        </div>
+        <div class="card">
+            <h2>Notifications</h2>
+            <p>Display important notifications and alerts.</p>
+        </div>
+        <div class="card">
+            <h2><% if (typeof userEmail !== 'undefined' && userEmail !== '') { %>
+                Welcome, <%= userEmail %>
+            <% } else { %>
+                User email not available.
+            <% } %></h2>
+        </div>
+    </div>
+</body>
+</html>
